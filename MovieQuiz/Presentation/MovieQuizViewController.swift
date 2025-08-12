@@ -2,7 +2,7 @@ import UIKit
 
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
->>>>>>> 272b339 (sprint 5 is over)
+
     
     // MARK: - Properties
     
@@ -19,15 +19,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var statisticService: StatisticServiceProtocol?
     
     private var alertPresenter: AlertPresenterProtocol?
->>>>>>> 272b339 (sprint 5 is over)
     
     // MARK: - Lyfecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-=======
+        
+        statisticService = StatisticService()
         
         questionFactory = QuestionFactory(delegate: self)
         alertPresenter = AlertPresenter(delegate: self)
@@ -46,14 +47,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
->>>>>>> 272b339 (sprint 5 is over)
     }
     
     //MARK: - Actions
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
         guard let currentQuestion = currentQuestion else { return }
->>>>>>> 272b339 (sprint 5 is over)
         let givenAnswer = true
         
         yesButtonClickedOutlet.isEnabled = false
@@ -63,7 +62,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
->>>>>>> 272b339 (sprint 5 is over)
             self.yesButtonClickedOutlet.isEnabled = true
             self.noButtonClickedOutlet.isEnabled = true
         }
@@ -71,7 +69,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         guard let currentQuestion = currentQuestion else { return }
->>>>>>> 272b339 (sprint 5 is over)
         let givenAnswer = false
         
         yesButtonClickedOutlet.isEnabled = false
@@ -82,7 +79,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
->>>>>>> 272b339 (sprint 5 is over)
             self.yesButtonClickedOutlet.isEnabled = true
             self.noButtonClickedOutlet.isEnabled = true
         }
@@ -110,7 +106,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
->>>>>>> 272b339 (sprint 5 is over)
             // код, который мы хотим вызвать через 1 секунду
             self.showNextQuestionOrResults()
         }
@@ -118,7 +113,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Private Helpers
     
->>>>>>> 272b339 (sprint 5 is over)
     
     
     private func convert(model: QuizQuestion) -> QuizStep {
@@ -126,7 +120,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
->>>>>>> 272b339 (sprint 5 is over)
         )
         return questionStep
     }
@@ -134,10 +127,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
->>>>>>> 272b339 (sprint 5 is over)
             // идем в состояние "результат квиза"
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
             let title = "Этот раунд окончен!"
-            let text = "Ваш результат: \(correctAnswers)/10"
+            let text = """
+                Ваш результат: \(correctAnswers)/10 \n
+                Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n
+                Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date()) \n
+                Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%
+            """
             let buttonText = "Сыграть еще раз"
             
             let alertModel = AlertModel(
@@ -155,7 +153,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             alertPresenter?.show(model: alertModel)
             imageView.layer.borderColor = UIColor.clear.cgColor
 
->>>>>>> 272b339 (sprint 5 is over)
         } else {
             currentQuestionIndex += 1
             // идем в состояние "вопрос показан"
@@ -174,4 +171,3 @@ extension MovieQuizViewController: AlertPresenterDelegate {
 }
 
 
->>>>>>> 272b339 (sprint 5 is over)
