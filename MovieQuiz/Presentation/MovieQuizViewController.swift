@@ -1,6 +1,8 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+>>>>>>> 272b339 (sprint 5 is over)
     
     // MARK: - Properties
     
@@ -10,21 +12,48 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet weak var noButtonClickedOutlet: UIButton!
     @IBOutlet weak var yesButtonClickedOutlet: UIButton!
     
-    private var currentQuestionIndex = 0
+
     private var correctAnswers = 0
-    private let questions = QuizQuestionMock.questions
+    
+    private var currentQuestionIndex = 0
+    private let questionsAmount = 10
+    private var questionFactory: QuestionFactoryProtocol?
+    private var currentQuestion: QuizQuestion?
+    
+    private var alertPresenter: AlertPresenterProtocol?
+>>>>>>> 272b339 (sprint 5 is over)
     
     // MARK: - Lyfecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        show(quiz: convert(model: questions[0]))
+=======
+        
+        questionFactory = QuestionFactory(delegate: self)
+        alertPresenter = AlertPresenter(delegate: self)
+        
+        questionFactory?.requestNextQuestion()
+    }
+    
+    // MARK: - QuestionFactoryDelegate
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else { return }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: viewModel)
+        }
+>>>>>>> 272b339 (sprint 5 is over)
     }
     
     //MARK: - Actions
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else { return }
+>>>>>>> 272b339 (sprint 5 is over)
         let givenAnswer = true
         
         yesButtonClickedOutlet.isEnabled = false
@@ -32,14 +61,17 @@ final class MovieQuizViewController: UIViewController {
         
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+>>>>>>> 272b339 (sprint 5 is over)
             self.yesButtonClickedOutlet.isEnabled = true
             self.noButtonClickedOutlet.isEnabled = true
         }
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        let currentQuestion = questions[currentQuestionIndex]
+        guard let currentQuestion = currentQuestion else { return }
+>>>>>>> 272b339 (sprint 5 is over)
         let givenAnswer = false
         
         yesButtonClickedOutlet.isEnabled = false
@@ -47,7 +79,10 @@ final class MovieQuizViewController: UIViewController {
         
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+>>>>>>> 272b339 (sprint 5 is over)
             self.yesButtonClickedOutlet.isEnabled = true
             self.noButtonClickedOutlet.isEnabled = true
         }
@@ -73,7 +108,9 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 20
         
         // запускаем задачу через 1 секунду c помощью диспетчера задач
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+>>>>>>> 272b339 (sprint 5 is over)
             // код, который мы хотим вызвать через 1 секунду
             self.showNextQuestionOrResults()
         }
@@ -81,51 +118,60 @@ final class MovieQuizViewController: UIViewController {
     
     //MARK: - Private Helpers
     
-    private func show(quiz result: QuizResults) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            
-            let firstQuestion = self.questions[self.currentQuestionIndex]
-            let viewModel = self.convert(model: firstQuestion)
-            self.show(quiz: viewModel)
-        }
-        
-        alert.addAction(action)
-        
-        self.present(alert, animated: true, completion: nil)
-    }
+>>>>>>> 272b339 (sprint 5 is over)
     
     
     private func convert(model: QuizQuestion) -> QuizStep {
         let questionStep = QuizStep(
             image: UIImage(named: model.image) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)"
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
+>>>>>>> 272b339 (sprint 5 is over)
         )
         return questionStep
     }
     
     
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questions.count - 1 {
+        if currentQuestionIndex == questionsAmount - 1 {
+>>>>>>> 272b339 (sprint 5 is over)
             // идем в состояние "результат квиза"
             let title = "Этот раунд окончен!"
             let text = "Ваш результат: \(correctAnswers)/10"
             let buttonText = "Сыграть еще раз"
-            let viewModel = QuizResults(title: title, text: text, buttonText: buttonText)
+            
+            let alertModel = AlertModel(
+                title: title,
+                message: text,
+                buttonText: buttonText
+            ) { [weak self] in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory?.reset()
+                self.questionFactory?.requestNextQuestion()
+            }
+
+            alertPresenter?.show(model: alertModel)
             imageView.layer.borderColor = UIColor.clear.cgColor
-            show(quiz: viewModel)
+
+>>>>>>> 272b339 (sprint 5 is over)
         } else {
             currentQuestionIndex += 1
             // идем в состояние "вопрос показан"
             imageView.layer.borderColor = UIColor.clear.cgColor
-            show(quiz: convert(model: questions[currentQuestionIndex]))
+            self.questionFactory?.requestNextQuestion()
         }
     }
 }
+
+// MARK: - AlertPresenterDelegate
+
+extension MovieQuizViewController: AlertPresenterDelegate {
+    func presentAlert(_ alert: UIAlertController) {
+        present(alert, animated: true, completion: nil)
+    }
+}
+
+
+>>>>>>> 272b339 (sprint 5 is over)
