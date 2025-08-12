@@ -14,6 +14,7 @@ class AlertPresenter: AlertPresenterProtocol {
         }
 
         func show(model: AlertModel) {
+            
             let alert = UIAlertController(
                 title: model.title,
                 message: model.message,
@@ -31,3 +32,4 @@ class AlertPresenter: AlertPresenterProtocol {
             delegate?.presentAlert(alert)
         }
 }
+// п //
