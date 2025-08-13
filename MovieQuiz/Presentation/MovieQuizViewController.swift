@@ -53,12 +53,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
         guard let currentQuestion = currentQuestion else { return }
-        let givenAnswer = true
         
         yesButtonClickedOutlet.isEnabled = false
         noButtonClickedOutlet.isEnabled = false
         
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: currentQuestion.correctAnswer)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
@@ -69,12 +68,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         guard let currentQuestion = currentQuestion else { return }
-        let givenAnswer = false
         
         yesButtonClickedOutlet.isEnabled = false
         noButtonClickedOutlet.isEnabled = false
         
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
         
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
@@ -113,8 +111,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //MARK: - Private Helpers
     
-    
-    
     private func convert(model: QuizQuestion) -> QuizStep {
         let questionStep = QuizStep(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -133,7 +129,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             let text = """
                 Ваш результат: \(correctAnswers)/10 \n
                 Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n
-                Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date()) \n
+                Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date.dateTimeString ?? "") \n
                 Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%
             """
             let buttonText = "Сыграть еще раз"
