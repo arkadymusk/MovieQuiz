@@ -32,4 +32,4 @@ class AlertPresenter: AlertPresenterProtocol {
             delegate?.presentAlert(alert)
         }
 }
-// п //
+
