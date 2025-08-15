@@ -77,6 +77,4 @@ extension StatisticService: StatisticServiceProtocol {
             bestGame = currentGame
         }
     }
-    
-    
 }

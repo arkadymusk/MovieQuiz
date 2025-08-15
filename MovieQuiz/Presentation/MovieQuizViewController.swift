@@ -17,7 +17,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticServiceProtocol?
-    
     private var alertPresenter: AlertPresenterProtocol?
     
     // MARK: - Lyfecycle
@@ -120,7 +119,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
             // идем в состояние "результат квиза"
+            
             statisticService?.store(correct: correctAnswers, total: questionsAmount)
+            
             let title = "Этот раунд окончен!"
             let text = """
                 Ваш результат: \(correctAnswers)/10 \n
