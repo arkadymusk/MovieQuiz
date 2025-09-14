@@ -65,12 +65,32 @@ class QuestionFactory: QuestionFactoryProtocol {
             
             let rating = Float(movie.rating) ?? 0
             
-            let randomRating = (6..<10).randomElement()
+            let questionType = (0..<3).randomElement()
             
-            guard let randomRating = randomRating else { return }
+            guard let questionType = questionType else { return }
             
-            let text = "Рейтинг этого фильма больше чем \(randomRating)?"
-            let correctAnswer = rating > Float(randomRating)
+            var text = ""
+            var correctAnswer = false
+            var comparisonValue: Float = 0
+            switch questionType {
+            case 0:
+                comparisonValue = Float(Int(rating))
+                text = "Рейтинг этого фильма больше чем \(Int(comparisonValue))?"
+                correctAnswer = rating > comparisonValue
+            case 1:
+                comparisonValue = Float(Int(rating))
+                text = "Рейтинг этого фильма меньше чем \(Int(comparisonValue))?"
+                correctAnswer = rating < comparisonValue
+            case 2:
+                comparisonValue = Float(Int(rating - 1.0))
+                text = "Рейтинг этого фильма больше чем \(Int(comparisonValue))?"
+                correctAnswer = rating > comparisonValue
+            default:
+                text = "Рейтинг этого фильма больше чем 7?"
+                correctAnswer = rating > 7
+            }
+            
+            
             
             let question = QuizQuestion(image: imageData,
                                         text: text,
@@ -88,4 +108,3 @@ class QuestionFactory: QuestionFactoryProtocol {
         currentQuestionIndex = 0
     }
 }
-

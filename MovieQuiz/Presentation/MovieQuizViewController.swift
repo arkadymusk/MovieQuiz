@@ -10,7 +10,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var noButtonClickedOutlet: UIButton!
     @IBOutlet private weak var yesButtonClickedOutlet: UIButton!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
-    
+    @IBOutlet weak var QuestionTitleLabel: UILabel!
     private var correctAnswers = 0
     
     private var currentQuestionIndex = 0
@@ -29,6 +29,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(delegate: self)
+        
+        setQuizUIHidden(true)
         
         showLoadingIndicator()
         questionFactory?.loadData()
@@ -49,6 +51,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     func didLoadDataFromServer() {
         activityIndicator.isHidden = true
+        setQuizUIHidden(false)
         questionFactory?.requestNextQuestion()
     }
     
@@ -136,7 +139,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             
-            self.questionFactory?.requestNextQuestion()
+            self.showLoadingIndicator()
+            self.questionFactory?.loadData()
         }
         alertPresenter?.show(model: model)
     }
@@ -190,6 +194,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.questionFactory?.requestNextQuestion()
         }
     }
+    
+    private func setQuizUIHidden(_ hidden: Bool) {
+        imageView.isHidden = hidden
+        textLabel.isHidden = hidden
+        counterLabel.isHidden = hidden
+        yesButtonClickedOutlet.isHidden = hidden
+        noButtonClickedOutlet.isHidden = hidden
+        QuestionTitleLabel.isHidden = hidden
+    }
 }
 
 // MARK: - AlertPresenterDelegate
@@ -199,5 +212,4 @@ extension MovieQuizViewController: AlertPresenterDelegate {
         present(alert, animated: true, completion: nil)
     }
 }
-
 
