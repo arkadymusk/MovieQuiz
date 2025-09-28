@@ -29,6 +29,9 @@ class AlertPresenter: AlertPresenterProtocol {
             }
 
             alert.addAction(action)
+            
+            alert.view.accessibilityIdentifier = "Game Results"
+            
             delegate?.presentAlert(alert)
         }
 }
