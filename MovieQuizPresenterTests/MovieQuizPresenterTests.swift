@@ -5,12 +5,55 @@
 //  Created by Аркадий Червонный on 29.09.2025.
 //
 
-import Testing
+import XCTest
+@testable import MovieQuiz
 
-struct MovieQuizPresenterTests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
+    func show(quiz step: QuizStep) {
+    
     }
+    
+    func show(quiz result: QuizResults) {
+    
+    }
+    
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+    
+    }
+    
+    func showLoadingIndicator() {
+    
+    }
+    
+    func hideLoadingIndicator() {
+    
+    }
+    
+    func showNetworkError(message: String) {
+    
+    }
+    
+    func setButtonsEnabled(_ isEnabled: Bool) {
+        
+    }
+    
+    func clearImageBorder() {
+        
+    }
+}
 
+
+final class MovieQuizPresenterTests: XCTestCase {
+    func testPresenterConvertModel() throws {
+        let viewControllerMock = MovieQuizViewControllerMock()
+        let sut = MovieQuizPresenter(viewController: viewControllerMock)
+        
+        let emptyData = Data()
+        let question = QuizQuestion(image: emptyData, text: "Question Text", correctAnswer: true)
+        let viewModel = sut.convert(model: question)
+        
+        XCTAssertNotNil(viewModel.image)
+        XCTAssertEqual(viewModel.question, "Question Text")
+        XCTAssertEqual(viewModel.questionNumber, "1/10")
+    }
 }

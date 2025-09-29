@@ -10,18 +10,21 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
-    var correctAnswers: Int = 0
-    var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
-    var questionFactory: QuestionFactoryProtocol?
-    var statisticService: StatisticServiceProtocol?
+    private var correctAnswers: Int = 0
+    private var currentQuestion: QuizQuestion?
+    private var viewController: MovieQuizViewControllerProtocol?
+    private var questionFactory: QuestionFactoryProtocol?
+    private var statisticService: StatisticServiceProtocol?
     var alertPresenter: AlertPresenterProtocol?
+    private var isAnsweringNow = false
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
+        statisticService = StatisticService()
+        alertPresenter = AlertPresenter(delegate: viewController as? AlertPresenterDelegate)
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        questionFactory?.loadData()
         viewController.showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     func isLastQuestion() -> Bool {
@@ -52,12 +55,13 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else { return }
         
-        let givenAnswer = isYes
-        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: isYes == currentQuestion.correctAnswer)
     }
     
     func didAnswer(isCorrectAnswer: Bool) {
-        correctAnswers += 1
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
     }
     
     func restartGame() {
@@ -100,32 +104,37 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             }
 
             alertPresenter?.show(model: alertModel)
-            viewController?.imageView.layer.borderColor = UIColor.clear.cgColor
+            viewController?.clearImageBorder()
 
         } else {
             self.switchToNextQuestion()
             // идем в состояние "вопрос показан"
-            viewController?.imageView.layer.borderColor = UIColor.clear.cgColor
+            viewController?.clearImageBorder()
             self.questionFactory?.requestNextQuestion()
         }
     }
     
+    
+    
     func proceedWithAnswer(isCorrect: Bool) {
+        guard !isAnsweringNow else { return }
+        isAnsweringNow = true
+        
         didAnswer(isCorrectAnswer: isCorrect)
         
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        viewController?.setButtonsEnabled(false)
         
         // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
             // код, который мы хотим вызвать через 1 секунду
-            self.proceedToNextQuestionOrResults()
+            self?.proceedToNextQuestionOrResults()
         }
     }
     
     func didLoadDataFromServer() {
-           viewController?.hideLoadingIndicator()
-           questionFactory?.requestNextQuestion()
+        viewController?.hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
     }
        
     func didFailToLoadData(with error: Error) {
@@ -136,7 +145,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func reloadData() {
         questionFactory?.loadData()
     }
-       
+    
     func didRecieveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
@@ -145,7 +154,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
-            self?.viewController?.show(quiz: viewModel)
+            guard let self = self else { return }
+            self.viewController?.clearImageBorder()
+            self.viewController?.show(quiz: viewModel)
+            self.viewController?.setButtonsEnabled(true)
+            self.isAnsweringNow = false
         }
     }
 }

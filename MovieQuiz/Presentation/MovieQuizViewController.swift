@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     
     // MARK: - Properties
@@ -12,41 +12,19 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet weak var yesButtonClickedOutlet: UIButton!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var QuestionTitleLabel: UILabel!
-    //private var statisticService: StatisticServiceProtocol?
-    private var alertPresenter: AlertPresenterProtocol?
     private var presenter: MovieQuizPresenter!
     
     // MARK: - Lyfecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        activityIndicator.hidesWhenStopped = true
         presenter = MovieQuizPresenter(viewController: self)
-        presenter.viewController = self
-        
-        
-        
-        //statisticService = StatisticService()
-        
-        //questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        alertPresenter = AlertPresenter(delegate: self)
         
         setQuizUIHidden(true)
         
         showLoadingIndicator()
-        //questionFactory?.loadData()
     }
-    
-    // MARK: - QuestionFactoryDelegate
-    
-//    func didLoadDataFromServer() {
-//        activityIndicator.isHidden = true
-//        setQuizUIHidden(false)
-//        questionFactory?.requestNextQuestion()
-//    }
-    
-//    func didFailToLoadData(with error: Error) {
-//        showNetworkError(message: error.localizedDescription)
-//    }
     
     //MARK: - Actions
     
@@ -58,9 +36,17 @@ final class MovieQuizViewController: UIViewController {
         presenter.noButtonClicked()
     }
     
+    
     //MARK: - Setup Methods
     
+    func setButtonsEnabled(_ isEnabled: Bool) {
+        yesButtonClickedOutlet.isEnabled = isEnabled
+        noButtonClickedOutlet.isEnabled = isEnabled
+    }
+    
     func show(quiz step: QuizStep) {
+        setQuizUIHidden(false)
+        hideLoadingIndicator()
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
@@ -73,17 +59,15 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 20
     }
     
-//    func didRecieveNextQuestion(question: QuizQuestion?) {
-//           presenter.didRecieveNextQuestion(question: question)
-//       }
+    func clearImageBorder() {
+        imageView.layer.borderColor = UIColor.clear.cgColor
+    }
     
     func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     
     func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
     }
     
@@ -101,10 +85,10 @@ final class MovieQuizViewController: UIViewController {
             self.showLoadingIndicator()
             self.presenter.reloadData()
         }
-        alertPresenter?.show(model: model)
+        presenter.alertPresenter?.show(model: model)
     }
     
-    //MARK: - Private Helpers
+//MARK: - Private Helpers
     
     
     

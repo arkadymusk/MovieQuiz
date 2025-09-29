@@ -34,7 +34,7 @@ class MoviesLoaderTests: XCTestCase {
     
     func testFailureLoading() throws {
         //Given
-        let stubetworkClient = StubNetworkClient(emulateError: false)
+        let stubetworkClient = StubNetworkClient(emulateError: true)
         let loader = MoviesLoader(networkClient: stubetworkClient)
         
         //When
@@ -46,10 +46,9 @@ class MoviesLoaderTests: XCTestCase {
             switch result {
             case .success(_):
                 XCTFail("Unexpected failure")
-            case .failure(let error):
+            case let error:
                 XCTAssertNotNil(error)
                 expectation.fulfill()
-                XCTFail("Unexpected failure")
             }
         }
         waitForExpectations(timeout: 1)

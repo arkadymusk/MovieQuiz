@@ -31,7 +31,7 @@ class ArrayTests: XCTestCase {
         let value = array[safe: 20]
         
         //Then
-        XCTAssertNotNil(value)
+        XCTAssertNil(value)
     }
     
 }

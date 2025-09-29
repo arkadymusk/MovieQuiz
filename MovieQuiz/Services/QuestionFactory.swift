@@ -102,9 +102,4 @@ class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
-    
-//    func reset() {
-//        shuffledQuestions = movies.shuffled()
-//        currentQuestionIndex = 0
-//    }
 }
