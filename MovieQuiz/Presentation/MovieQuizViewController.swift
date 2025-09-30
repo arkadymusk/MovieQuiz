@@ -16,6 +16,26 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     // MARK: - Lyfecycle
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        func dumpFont(_ name: String, _ font: UIFont?) {
+            guard let f = font else { return }
+            print("[FONT] \(name): \(f.fontName) \(f.pointSize)")
+        }
+
+        dumpFont("QuestionTitleLabel", QuestionTitleLabel.font)
+        dumpFont("textLabel", textLabel.font)
+        dumpFont("counterLabel", counterLabel.font)
+        dumpFont("yesButton.titleLabel", yesButtonClickedOutlet.titleLabel?.font)
+        dumpFont("noButton.titleLabel", noButtonClickedOutlet.titleLabel?.font)
+        
+        for family in UIFont.familyNames.sorted() {
+            print("Family: \(family)")
+            print(UIFont.fontNames(forFamilyName: family))
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         activityIndicator.hidesWhenStopped = true
