@@ -30,7 +30,7 @@ extension StatisticService: StatisticServiceProtocol {
             storage.set(newValue, forKey: Keys.correctAnswers.rawValue)
         }
     }
-    
+        
     var gamesCount: Int {
         get {
             return storage.integer(forKey: Keys.gamesCount.rawValue)
