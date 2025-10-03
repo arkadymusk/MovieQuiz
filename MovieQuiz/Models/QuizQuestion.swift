@@ -4,6 +4,7 @@
 //
 //  Created by Аркадий Червонный on 26.03.2025.
 //
+
 import Foundation
 
 struct QuizQuestion {
